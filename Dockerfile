@@ -1,16 +1,17 @@
 FROM node:20-alpine
 
+ARG UID=1001
+ARG GID=1001
+
 WORKDIR /app
 
-# Create a non-root user
-RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
+RUN addgroup -S -g $GID nodejs && adduser -S -u $UID -G nodejs nextjs
 
 COPY package*.json ./
 RUN npm install
 
 COPY . .
 
-# Give ownership of the app dir to nextjs user
 RUN chown -R nextjs:nodejs /app
 
 USER nextjs
