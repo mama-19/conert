@@ -1,0 +1,21 @@
+services:
+  concert:
+    build: .
+    container_name: concert1
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next          # Anonymous volume allows container to own build files
+    working_dir: /app
+    environment:
+      - WATCHPACK_POLLING=true # Enables hot reloading in Docker environments
+      - NODE_ENV=development
+    command: npm run dev
+    networks:
+      - local-network
+
+networks:
+  local-network:
+    driver: bridge

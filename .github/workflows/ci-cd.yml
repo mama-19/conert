@@ -1,0 +1,36 @@
+name: Deploy Next.js App
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Production Server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: 192.168.102.22
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/smartquiz_saas_sandbox/conert || exit
+
+            echo "📥 Pull latest code"
+            git pull origin main
+
+            echo "🧹 Remove old containers"
+            docker compose down
+
+            echo "🐳 Build new image"
+            docker compose build --no-cache
+
+            echo "🚀 Start Next.js app"
+            docker compose up -d
+
+            echo "🧽 Clean unused images"
+            docker image prune -f
+
+            echo "✅ Deployment done"
